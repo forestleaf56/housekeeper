@@ -1,0 +1,556 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>TidyUp - Home Manager</title>
+    <style>
+        /* --- HOUSEKEEPER THEME VARIABLES --- */
+        :root {
+            --fresh-sage: #8FBC8F;       /* Primary Green */
+            --clean-white: #ffffff;      /* Backgrounds */
+            --linen-beige: #f5f5dc;      /* Texture/Warmth */
+            --water-blue: #add8e6;       /* Accents */
+            --slate-grey: #4a4a4a;       /* Text */
+            --dust-grey: #f0f0f0;        /* App BG */
+            
+            /* Fonts */
+            --font-ui: "Verdana", "Segoe UI", sans-serif; /* Clean & Crisp */
+            --font-hand: "Comic Sans MS", "Chalkboard SE", sans-serif; /* Notes style */
+            
+            /* Background: Subtle linen pattern */
+            --bg-pattern: repeating-linear-gradient(
+                45deg,
+                #fcfcfc,
+                #fcfcfc 10px,
+                #f7f7f7 10px,
+                #f7f7f7 20px
+            );
+        }
+
+        * {
+            box-sizing: border-box;
+            scrollbar-color: var(--fresh-sage) var(--dust-grey);
+            scrollbar-width: thin;
+            -webkit-tap-highlight-color: transparent; 
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%; 
+            height: 100dvh; 
+            width: 100vw;
+            overflow: hidden; 
+        }
+
+        body {
+            font-family: var(--font-ui);
+            background-color: var(--dust-grey);
+            background-image: var(--bg-pattern); 
+            color: var(--slate-grey);
+            display: flex;
+            align-items: center; 
+            justify-content: center; 
+        }
+
+        /* --- THE HOME HUB WINDOW --- */
+        .main-window {
+            width: 90%;
+            max-width: 800px;
+            height: 85vh; 
+            
+            /* Clean Organizer Look */
+            background-color: #fff; 
+            border: 8px solid #fff; /* White border like a photo frame */
+            outline: 1px solid #ddd;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- HEADER --- */
+        header {
+            background: var(--fresh-sage);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+            color: #fff;
+            flex-shrink: 0; 
+            border-radius: 8px;
+            margin: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header-title-box {
+            display: flex; 
+            align-items: center; 
+            gap: 10px;
+            flex: 1;          
+        }
+
+        .window-title {
+            font-family: var(--font-ui);
+            font-size: 1.2rem;
+            color: #fff;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        /* Status Badge */
+        .sequence-counter {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-family: var(--font-ui);
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.5);
+            white-space: nowrap;
+        }
+        
+        .marquee-container {
+            background: #fff;
+            color: var(--fresh-sage);
+            font-family: var(--font-ui);
+            padding: 8px;
+            font-size: 0.85rem;
+            border-bottom: 1px dashed #ddd;
+            flex-shrink: 0;
+            font-style: italic;
+        }
+
+        /* --- CHAT AREA --- */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background-color: #fff; /* Clean white interior */
+            -webkit-overflow-scrolling: touch; 
+        }
+
+        .default-text {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px;
+            background: var(--linen-beige);
+            color: var(--slate-grey);
+            border: 2px dashed #dcdcdc;
+            border-radius: 15px;
+            width: 85%;
+            margin-left: auto;
+            margin-right: auto;
+            transform: rotate(-1deg); /* Sticky note vibe */
+        }
+        .default-text h1 {
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+            color: var(--fresh-sage);
+            font-family: var(--font-hand);
+        }
+        .default-text p {
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* --- MESSAGE BUBBLES --- */
+        .chat {
+            padding: 15px;
+            max-width: 85%;
+            position: relative;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            border-radius: 15px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* Housekeeper Bubble (Clean & Crisp) */
+        .chat.incoming {
+            align-self: flex-start;
+            background: #f9f9f9;
+            color: var(--slate-grey);
+            border: 1px solid #eee;
+            border-top-left-radius: 0;
+        }
+
+        /* Homeowner Bubble (Sage Green) */
+        .chat.outgoing {
+            align-self: flex-end;
+            text-align: right;
+            background: var(--fresh-sage);
+            color: #fff;
+            border-top-right-radius: 0;
+        }
+
+        .chat-details {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .avatar-box {
+            background: #fff;
+            border: 2px solid var(--fresh-sage);
+            width: 40px; 
+            height: 40px;
+            min-width: 40px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%; 
+            overflow: hidden;
+            padding: 0;
+        }
+        
+        .avatar-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .chat-content p {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .chat-content p.error { color: #d9534f; font-weight:bold; }
+
+        .timestamp {
+            font-size: 0.65rem;
+            color: #aaa;
+            margin-bottom: 4px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .chat.outgoing .timestamp { color: rgba(255,255,255,0.8); }
+
+        /* --- TYPING AREA --- */
+        .typing-container {
+            padding: 15px;
+            background: #fff;
+            border-top: 1px solid #eee;
+            flex-shrink: 0;
+            padding-bottom: calc(15px + env(safe-area-inset-bottom)); 
+        }
+
+        .control-panel {
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        .typing-textarea {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: var(--dust-grey);
+            padding: 5px 10px;
+            border-radius: 30px;
+        }
+
+        textarea {
+            flex: 1;
+            height: 40px;
+            resize: none;
+            border: none;
+            background: transparent;
+            color: #333;
+            padding: 8px;
+            font-family: var(--font-ui);
+            font-size: 16px; 
+            outline: none;
+        }
+
+        /* --- BUTTONS --- */
+        .btn-dna {
+            background: var(--fresh-sage);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-dna:hover {
+            background: #7aa37a;
+            transform: scale(1.1);
+        }
+        
+        .btn-reset { 
+            font-size: 0.7rem; 
+            width: auto;
+            height: auto;
+            background: transparent; 
+            border: 1px solid #ccc;
+            color: #999;
+            border-radius: 15px;
+            padding: 4px 10px;
+            box-shadow: none;
+        }
+        .btn-reset:hover { color: var(--fresh-sage); border-color:var(--fresh-sage); background: #fff; transform: none;}
+
+        /* --- ANIMATIONS --- */
+        .blink { animation: blinker 2s infinite ease-in-out; }
+        @keyframes blinker { 50% { opacity: 0.5; } }
+
+        .typing-animation {
+            display: flex;
+            gap: 4px;
+            padding-top: 5px;
+        }
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--fresh-sage);
+            border-radius: 50%;
+            animation: bounce 0.6s infinite alternate;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; background: var(--water-blue); }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; background: #ddd; }
+        @keyframes bounce { to { transform: translateY(-4px); } }
+
+        /* --- MOBILE SPECIFIC FIXES --- */
+        @media (max-width: 600px) {
+            .main-window { 
+                width: 95%; 
+                height: 96dvh; 
+                margin: auto; 
+                border-radius: 12px;
+            }
+            
+            header { padding: 12px; }
+            .window-title { font-size: 1.1rem; }
+            .sequence-counter { display: none; } 
+            
+            .chat-container { padding: 15px; }
+            
+            /* Make text area pill clearer on mobile */
+            .typing-textarea { border: 1px solid #ddd; background: #fff; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="main-window">
+        <header>
+            <div class="header-title-box">
+                <div style="background:rgba(255,255,255,0.2); width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                    <span style="font-size:1.2rem;">🏠</span>
+                </div>
+                <div>
+                    <span class="window-title">TidyUp</span>
+                </div>
+            </div>
+            <div class="sequence-counter">
+                <span>✨ Status: Sparkling</span>
+            </div>
+            <div style="font-size:1.5rem; cursor:pointer; color:#fff; margin-left:15px; opacity:0.8;" onclick="window.close()">&times;</div>
+        </header>
+
+        <div class="marquee-container">
+            <marquee scrollamount="4">Remember to water the plants ... Laundry day is tomorrow ... Fresh sheets = Sweet dreams ... A tidy home is a happy home ...</marquee>
+        </div>
+
+        <div class="chat-container">
+            </div>
+
+        <div class="typing-container">
+            <div class="control-panel">
+                <span>HOUSEKEEPER: <span class="blink" style="color:var(--fresh-sage)">ACTIVE</span></span>
+                <button id="delete-btn" class="btn-dna btn-reset">Fresh Start</button>
+            </div>
+            <div class="typing-textarea">
+                <textarea id="chat-input" placeholder="Ask about cleaning tips, recipes, chores..." required></textarea>
+                <button id="send-btn" class="btn-dna">🧹</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatInput = document.querySelector("#chat-input");
+        const sendButton = document.querySelector("#send-btn");
+        const chatContainer = document.querySelector(".chat-container");
+        const deleteButton = document.querySelector("#delete-btn");
+
+        // --- UPDATED: POINT TO VERCEL BACKEND ---
+        // We use the same generic chat endpoint which handles the hidden API key
+        const API_URL = "/api/chat"; 
+
+        // THEME AVATARS
+        // Housekeeper (Friendly Robot or Maid Icon)
+        const HOUSEKEEPER_AVATAR = "https://media.giphy.com/media/l2JJEM9u76yD1sZBC/giphy.gif"; 
+        // Homeowner (Relaxed Person)
+        const USER_AVATAR = "https://media.giphy.com/media/3o6Zt6ML6Jjc0dgV56/giphy.gif"; 
+
+        // System Prompt: Defined Housekeeper/Home Manager
+        let conversation = JSON.parse(localStorage.getItem("conversation_home")) || [
+            {
+                role: "system",
+                content: "Act as TidyUp, a professional, warm, and highly efficient home manager and housekeeper. You help the user organize their home, plan meals, create cleaning schedules, and remove stains. You are polite, encouraging, and practical. You love clean spaces and efficient routines. Your tone is like a helpful Mary Poppins or a smart home butler."
+            }
+        ];
+
+        const loadDataFromLocalstorage = () => {
+            chatContainer.innerHTML = localStorage.getItem("all-chats-home") || 
+            `<div class="default-text">
+                <h1>Welcome Home!</h1>
+                <p>I'm your personal Home Manager.<br>Need a meal plan? A cleaning tip?<br>Or just help organizing the closet?</p>
+             </div>`;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        };
+
+        const createChatElement = (content, className) => {
+            const div = document.createElement("div");
+            div.classList.add("chat", className);
+            div.innerHTML = content;
+            return div;
+        };
+
+        const saveConversation = () => {
+            localStorage.setItem("conversation_home", JSON.stringify(conversation));
+        };
+
+        const getChatResponse = async (incomingChatDiv) => {
+            const p = document.createElement("p");
+
+            try {
+                // Send request to our Vercel backend
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    // We only send the messages array. 
+                    // The backend (chat.js) handles the model, key, and parameters.
+                    body: JSON.stringify({
+                        messages: conversation
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Server communication failed.");
+                }
+
+                const data = await response.json();
+                
+                if(data.error) {
+                    throw new Error(data.error.message);
+                }
+
+                const reply = data.choices[0].message.content.trim();
+
+                conversation.push({ role: "assistant", content: reply });
+                saveConversation();
+
+                p.textContent = reply;
+            } catch (err) {
+                p.textContent = "Household Error: " + err.message;
+                p.classList.add("error");
+            }
+
+            incomingChatDiv.querySelector(".typing-animation").remove();
+            incomingChatDiv.querySelector(".chat-details").appendChild(p);
+            localStorage.setItem("all-chats-home", chatContainer.innerHTML);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        };
+
+        const showTypingAnimation = () => {
+            const html = `
+                <div class="chat-content">
+                    <span class="timestamp">Home Manager:</span>
+                    <div class="chat-details">
+                        <div class="avatar-box"><img src="${HOUSEKEEPER_AVATAR}"></div>
+                        <div class="typing-animation">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                </div>`;
+            const div = createChatElement(html, "incoming");
+            chatContainer.appendChild(div);
+            getChatResponse(div);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        };
+
+        const handleOutgoingChat = () => {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            chatInput.value = "";
+
+            conversation.push({ role: "user", content: text });
+            saveConversation();
+
+            const html = `
+                <div class="chat-content">
+                     <span class="timestamp" style="text-align:right;">Homeowner:</span>
+                    <div class="chat-details" style="flex-direction:row-reverse;">
+                        <div class="avatar-box"><img src="${USER_AVATAR}"></div>
+                        <p>${text}</p>
+                    </div>
+                </div>`;
+
+            // Remove default welcome text
+            const defaultText = chatContainer.querySelector(".default-text");
+            if (defaultText) defaultText.remove();
+
+            chatContainer.appendChild(createChatElement(html, "outgoing"));
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            setTimeout(showTypingAnimation, 600);
+        };
+
+        deleteButton.addEventListener("click", () => {
+            if (!confirm("Start a fresh slate? This will clear your household notes.")) return;
+            localStorage.removeItem("conversation_home");
+            localStorage.removeItem("all-chats-home");
+            conversation = [
+                {
+                    role: "system",
+                    content: "Act as TidyUp, a professional, warm, and highly efficient home manager and housekeeper. You help the user organize their home, plan meals, create cleaning schedules, and remove stains. You are polite, encouraging, and practical."
+                }
+            ];
+            chatContainer.innerHTML = "";
+            loadDataFromLocalstorage();
+        });
+
+        chatInput.addEventListener("keydown", e => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleOutgoingChat();
+            }
+        });
+
+        sendButton.addEventListener("click", handleOutgoingChat);
+
+        loadDataFromLocalstorage();
+    </script>
+</body>
+</html>
+
